@@ -1,0 +1,245 @@
+import React, { useState } from "react";
+import JitsiEmbed from "./JitsiEmbed";
+import "./DashboardDark.css";
+
+// For icons, you can use emojis or [Material Icons](https://fonts.google.com/icons) with a small library.
+const Icons = {
+  micOn: "🎤", micOff: "🔇",
+  camOn: "📷", camOff: "🚫",
+  user: "🧑",
+  live: "🔴",
+  control: "🕹️",
+  viewers: "👥",
+  copy: "📋",
+  share: "📤"
+};
+
+const ROLES = ["Mafia", "Citizen", "Detective", "Doctor", "Custom"];
+function randomizeRoles(playerCount) {
+  let arr = new Array(playerCount).fill("Citizen");
+  if (playerCount > 1) arr[0] = "Mafia";
+  if (playerCount > 2) arr[1] = "Detective";
+  if (playerCount > 3) arr[2] = "Doctor";
+  // shuffle for demo (swap roles randomly)
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+export default function AdminDashboard() {
+  // Tab state: "live" | "control" | "viewers"
+  const [tab, setTab] = useState("control");
+  const [gameStarted, setGameStarted] = useState(false);
+  const [roomName, setRoomName] = useState("");
+  // Example: players coming from join event. Replace with your real join logic.
+  const [players, setPlayers] = useState([
+    { player_id: "1", name: "Ali", mic: true, cam: true, role: "Citizen" },
+    { player_id: "2", name: "Sara", mic: false, cam: true, role: "Mafia" },
+    { player_id: "3", name: "Ladan", mic: true, cam: false, role: "Detective" }
+  ]);
+
+  // Toggle player mic/cam
+  const toggleMic = id => setPlayers(players => players.map(p =>
+    p.player_id === id ? { ...p, mic: !p.mic } : p
+  ));
+  const toggleCam = id => setPlayers(players => players.map(p =>
+    p.player_id === id ? { ...p, cam: !p.cam } : p
+  ));
+
+  // Assign roles randomly
+  const assignRandomRoles = () => {
+    const randomRoles = randomizeRoles(players.length);
+    setPlayers(players => players.map((p, i) => ({
+      ...p, role: randomRoles[i] || "Citizen"
+    })));
+  };
+
+  // Set role for a player
+  const setRole = (id, role) =>
+    setPlayers(players => players.map(p =>
+      p.player_id === id ? { ...p, role } : p
+    ));
+
+  // Toggle all mic/cam
+  const toggleAll = (what, on) =>
+    setPlayers(players => players.map(p => ({ ...p, [what]: on })));
+
+  // Start game: generate room name and clear roles, mics/cams on
+  const startGame = () => {
+    setRoomName("mafia13-" + Date.now());
+    setPlayers(players => players.map(p => ({ ...p, mic: true, cam: true })));
+    setGameStarted(true);
+  };
+  const stopGame = () => {
+    setGameStarted(false);
+    setRoomName("");
+  };
+
+  // Copy/share player link
+  const playerLink = roomName
+    ? `${window.location.origin}/player?room=${roomName}` : "";
+
+  const handleCopy = () => {
+    if (playerLink) navigator.clipboard.writeText(playerLink);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: "Join the game", url: playerLink });
+    } else {
+      handleCopy();
+      alert("Link copied. Use your messenger app to share.");
+    }
+  };
+
+  // Simulate players joining: in production, connect to real data source
+  // useEffect(() => { subscribePlayers(setPlayers); }, []);
+
+  return (
+    <div className="dash-root">
+      {/* LIVE TAB */}
+      <div className={`dash-tab-panel${tab === "live" ? " tab-active" : ""}`}>
+        <h2 className="dash-title"><span className="tab-ic">{Icons.live}</span> Live Call</h2>
+        {gameStarted && roomName ? (
+          <div className="video-embed">
+            <JitsiEmbed
+              userType="admin"
+              roomName={roomName}
+              startWithAudioMuted={true}
+              startWithVideoMuted={true}
+            />
+          </div>
+        ) : (
+          <div className="not-started">Start the game to open the live video call.</div>
+        )}
+      </div>
+
+      {/* CONTROL TAB */}
+      <div className={`dash-tab-panel${tab === "control" ? " tab-active" : ""}`}>
+        <h2 className="dash-title"><span className="tab-ic">{Icons.control}</span> Game Control</h2>
+        <div className="game-info">
+          {gameStarted ? (
+            <>
+              <div>
+                <b>Player Link: </b>
+                <span className="invite-link">{playerLink}</span>
+                <button className="icon-btn icon-link" onClick={handleCopy} title="Copy">
+                  {Icons.copy}
+                </button>
+                <button className="icon-btn icon-link" onClick={handleShare} title="Share">
+                  {Icons.share}
+                </button>
+              </div>
+          
+            </>
+          ) : (
+            <span className="not-started">Players can join after the game starts.</span>
+          )}
+        </div>
+        <div className="center-area">
+          {!gameStarted ? (
+            <button className="main-btn start-btn center-btn" onClick={startGame}>▶ Start Game</button>
+          ) : (
+            <button className="main-btn stop-btn center-btn" onClick={stopGame}>■ Stop Game</button>
+          )}
+        </div>
+        {/* Player Table */}
+        <div className="players-table-container">
+          <table className="players-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Mic</th>
+                <th>Cam</th>
+              </tr>
+            </thead>
+            <tbody>
+              {players.map((p) => (
+                <tr key={p.player_id}>
+                  <td>
+                    <span className="tab-ic">{Icons.user}</span> {p.name}
+                  </td>
+                  <td>
+                    <button
+                      className="icon-btn role-btn"
+                      onClick={() => setRole(p.player_id,
+                        ROLES[(ROLES.indexOf(p.role) + 1) % ROLES.length]
+                      )}
+                      title="Change Role"
+                    >
+                      {p.role}
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className={`icon-btn ${p.mic ? "on" : "off"}`}
+                      onClick={() => toggleMic(p.player_id)}
+                      title={p.mic ? "Mute" : "Unmute"}
+                    >
+                      {p.mic ? Icons.micOn : Icons.micOff}
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className={`icon-btn ${p.cam ? "on" : "off"}`}
+                      onClick={() => toggleCam(p.player_id)}
+                      title={p.cam ? "Turn Off Camera" : "Turn On Camera"}
+                    >
+                      {p.cam ? Icons.camOn : Icons.camOff}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* VIEWERS TAB */}
+      <div className={`dash-tab-panel${tab === "viewers" ? " tab-active" : ""}`}>
+        <h2 className="dash-title"><span className="tab-ic">{Icons.viewers}</span> Viewers</h2>
+        <div className="placeholder-box">
+          <p>Controls for watchers and live vote/comments will show here.</p>
+        </div>
+      </div>
+
+      {/* Bottom Navbar */}
+      <nav className="dash-navbar">
+        <button className={`nav-icon-btn${tab === "live" ? " selected" : ""}`}
+          onClick={() => setTab("live")}>
+          <span className="navbar-icon">🎥</span>
+          <div className="nav-label">Live</div>
+        </button>
+        <button className={`nav-icon-btn nav-main-btn${tab === "control" ? " selected" : ""}`}
+          onClick={() => setTab("control")}>
+          <span className="navbar-icon main-icon">🕹️</span>
+          <div className="nav-label">Control</div>
+        </button>
+        <button className={`nav-icon-btn${tab === "viewers" ? " selected" : ""}`}
+          onClick={() => setTab("viewers")}>
+          <span className="navbar-icon">👥</span>
+          <div className="nav-label">Viewers</div>
+        </button>
+      </nav>
+    </div>
+  );
+}
+.table-header-btn {
+  color: #a3bbff;
+  background: #222a39;
+  border: none;
+  font-weight: 700;
+  font-size: 1.05em;
+  padding: 6px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #222a;
+  transition: background 0.13s, color 0.13s;
+}
+.table-header-btn:hover {
+  background: #29426c;
+  color: #fff;
+}
