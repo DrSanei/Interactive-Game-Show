@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import JitsiEmbed from "./JitsiEmbed";
 import "./DashboardDark.css";
 
-// You can replace with Material icons or SVGs if you want.
 const Icons = {
   micOn: "🎤", micOff: "🔇",
   camOn: "📷", camOff: "🚫",
@@ -108,6 +107,14 @@ export default function AdminDashboard() {
         ...s
       ]);
       setLlmInput("");
+    }
+  };
+
+  // --- Voting Question Post Handler ---
+  const handlePostQuestion = () => {
+    if (votingQuestion.trim()) {
+      alert("Question posted: " + votingQuestion);
+      // Post to backend or update state as needed
     }
   };
 
@@ -233,7 +240,7 @@ export default function AdminDashboard() {
             <button className="small-btn" onClick={() => setVotes([])}>Clear Votes</button>
           </div>
         </div>
-        <div className="question-control">
+        <div className="question-row">
           <label>Voting Question: </label>
           <input
             className="question-input"
@@ -242,6 +249,7 @@ export default function AdminDashboard() {
             onChange={e => setVotingQuestion(e.target.value)}
             style={{ width: "58%" }}
           />
+          <button className="post-btn" onClick={handlePostQuestion}>Post</button>
         </div>
         <div className="players-table-container" style={{ marginTop: 22 }}>
           <div className="table-title">Live Voting Table</div>
@@ -274,7 +282,7 @@ export default function AdminDashboard() {
         </div>
         {/* LLM Table */}
         <div className="players-table-container" style={{ marginTop: 18 }}>
-          <div className="table-title">LLM (AI) Summary</div>
+          <div className="table-title">AI Summary</div>
           <form
             style={{ margin: "8px 0", display: "flex", gap: "6px", alignItems: "center" }}
             onSubmit={e => { e.preventDefault(); handleAddLlm(); }}
@@ -284,7 +292,7 @@ export default function AdminDashboard() {
               value={llmInput}
               maxLength={200}
               onChange={e => setLlmInput(e.target.value)}
-              placeholder="Add LLM AI summary/comment..."
+              placeholder="Request AI Comments on a player ..."
             />
             <button className="small-btn" type="submit">Add</button>
           </form>

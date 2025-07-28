@@ -1,245 +1,147 @@
-import React, { useState } from "react";
-import JitsiEmbed from "./JitsiEmbed";
-import "./DashboardDark.css";
+/* AdminDashboard.css — modern dark UI template */
 
-// For icons, you can use emojis or [Material Icons](https://fonts.google.com/icons) with a small library.
-const Icons = {
-  micOn: "🎤", micOff: "🔇",
-  camOn: "📷", camOff: "🚫",
-  user: "🧑",
-  live: "🔴",
-  control: "🕹️",
-  viewers: "👥",
-  copy: "📋",
-  share: "📤"
-};
-
-const ROLES = ["Mafia", "Citizen", "Detective", "Doctor", "Custom"];
-function randomizeRoles(playerCount) {
-  let arr = new Array(playerCount).fill("Citizen");
-  if (playerCount > 1) arr[0] = "Mafia";
-  if (playerCount > 2) arr[1] = "Detective";
-  if (playerCount > 3) arr[2] = "Doctor";
-  // shuffle for demo (swap roles randomly)
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+body, html {
+  background: #181a20;
+  color: #e0e3eb;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-export default function AdminDashboard() {
-  // Tab state: "live" | "control" | "viewers"
-  const [tab, setTab] = useState("control");
-  const [gameStarted, setGameStarted] = useState(false);
-  const [roomName, setRoomName] = useState("");
-  // Example: players coming from join event. Replace with your real join logic.
-  const [players, setPlayers] = useState([
-    { player_id: "1", name: "Ali", mic: true, cam: true, role: "Citizen" },
-    { player_id: "2", name: "Sara", mic: false, cam: true, role: "Mafia" },
-    { player_id: "3", name: "Ladan", mic: true, cam: false, role: "Detective" }
-  ]);
-
-  // Toggle player mic/cam
-  const toggleMic = id => setPlayers(players => players.map(p =>
-    p.player_id === id ? { ...p, mic: !p.mic } : p
-  ));
-  const toggleCam = id => setPlayers(players => players.map(p =>
-    p.player_id === id ? { ...p, cam: !p.cam } : p
-  ));
-
-  // Assign roles randomly
-  const assignRandomRoles = () => {
-    const randomRoles = randomizeRoles(players.length);
-    setPlayers(players => players.map((p, i) => ({
-      ...p, role: randomRoles[i] || "Citizen"
-    })));
-  };
-
-  // Set role for a player
-  const setRole = (id, role) =>
-    setPlayers(players => players.map(p =>
-      p.player_id === id ? { ...p, role } : p
-    ));
-
-  // Toggle all mic/cam
-  const toggleAll = (what, on) =>
-    setPlayers(players => players.map(p => ({ ...p, [what]: on })));
-
-  // Start game: generate room name and clear roles, mics/cams on
-  const startGame = () => {
-    setRoomName("mafia13-" + Date.now());
-    setPlayers(players => players.map(p => ({ ...p, mic: true, cam: true })));
-    setGameStarted(true);
-  };
-  const stopGame = () => {
-    setGameStarted(false);
-    setRoomName("");
-  };
-
-  // Copy/share player link
-  const playerLink = roomName
-    ? `${window.location.origin}/player?room=${roomName}` : "";
-
-  const handleCopy = () => {
-    if (playerLink) navigator.clipboard.writeText(playerLink);
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({ title: "Join the game", url: playerLink });
-    } else {
-      handleCopy();
-      alert("Link copied. Use your messenger app to share.");
-    }
-  };
-
-  // Simulate players joining: in production, connect to real data source
-  // useEffect(() => { subscribePlayers(setPlayers); }, []);
-
-  return (
-    <div className="dash-root">
-      {/* LIVE TAB */}
-      <div className={`dash-tab-panel${tab === "live" ? " tab-active" : ""}`}>
-        <h2 className="dash-title"><span className="tab-ic">{Icons.live}</span> Live Call</h2>
-        {gameStarted && roomName ? (
-          <div className="video-embed">
-            <JitsiEmbed
-              userType="admin"
-              roomName={roomName}
-              startWithAudioMuted={true}
-              startWithVideoMuted={true}
-            />
-          </div>
-        ) : (
-          <div className="not-started">Start the game to open the live video call.</div>
-        )}
-      </div>
-
-      {/* CONTROL TAB */}
-      <div className={`dash-tab-panel${tab === "control" ? " tab-active" : ""}`}>
-        <h2 className="dash-title"><span className="tab-ic">{Icons.control}</span> Game Control</h2>
-        <div className="game-info">
-          {gameStarted ? (
-            <>
-              <div>
-                <b>Player Link: </b>
-                <span className="invite-link">{playerLink}</span>
-                <button className="icon-btn icon-link" onClick={handleCopy} title="Copy">
-                  {Icons.copy}
-                </button>
-                <button className="icon-btn icon-link" onClick={handleShare} title="Share">
-                  {Icons.share}
-                </button>
-              </div>
-          
-            </>
-          ) : (
-            <span className="not-started">Players can join after the game starts.</span>
-          )}
-        </div>
-        <div className="center-area">
-          {!gameStarted ? (
-            <button className="main-btn start-btn center-btn" onClick={startGame}>▶ Start Game</button>
-          ) : (
-            <button className="main-btn stop-btn center-btn" onClick={stopGame}>■ Stop Game</button>
-          )}
-        </div>
-        {/* Player Table */}
-        <div className="players-table-container">
-          <table className="players-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Mic</th>
-                <th>Cam</th>
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((p) => (
-                <tr key={p.player_id}>
-                  <td>
-                    <span className="tab-ic">{Icons.user}</span> {p.name}
-                  </td>
-                  <td>
-                    <button
-                      className="icon-btn role-btn"
-                      onClick={() => setRole(p.player_id,
-                        ROLES[(ROLES.indexOf(p.role) + 1) % ROLES.length]
-                      )}
-                      title="Change Role"
-                    >
-                      {p.role}
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      className={`icon-btn ${p.mic ? "on" : "off"}`}
-                      onClick={() => toggleMic(p.player_id)}
-                      title={p.mic ? "Mute" : "Unmute"}
-                    >
-                      {p.mic ? Icons.micOn : Icons.micOff}
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      className={`icon-btn ${p.cam ? "on" : "off"}`}
-                      onClick={() => toggleCam(p.player_id)}
-                      title={p.cam ? "Turn Off Camera" : "Turn On Camera"}
-                    >
-                      {p.cam ? Icons.camOn : Icons.camOff}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* VIEWERS TAB */}
-      <div className={`dash-tab-panel${tab === "viewers" ? " tab-active" : ""}`}>
-        <h2 className="dash-title"><span className="tab-ic">{Icons.viewers}</span> Viewers</h2>
-        <div className="placeholder-box">
-          <p>Controls for watchers and live vote/comments will show here.</p>
-        </div>
-      </div>
-
-      {/* Bottom Navbar */}
-      <nav className="dash-navbar">
-        <button className={`nav-icon-btn${tab === "live" ? " selected" : ""}`}
-          onClick={() => setTab("live")}>
-          <span className="navbar-icon">🎥</span>
-          <div className="nav-label">Live</div>
-        </button>
-        <button className={`nav-icon-btn nav-main-btn${tab === "control" ? " selected" : ""}`}
-          onClick={() => setTab("control")}>
-          <span className="navbar-icon main-icon">🕹️</span>
-          <div className="nav-label">Control</div>
-        </button>
-        <button className={`nav-icon-btn${tab === "viewers" ? " selected" : ""}`}
-          onClick={() => setTab("viewers")}>
-          <span className="navbar-icon">👥</span>
-          <div className="nav-label">Viewers</div>
-        </button>
-      </nav>
-    </div>
-  );
+.admin-dashboard {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 96px 24px;
+  background: #23262f;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.20);
+  min-height: 70vh;
 }
-.table-header-btn {
-  color: #a3bbff;
-  background: #222a39;
-  border: none;
-  font-weight: 700;
-  font-size: 1.05em;
-  padding: 6px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 1px 4px #222a;
-  transition: background 0.13s, color 0.13s;
+
+.dashboard-section {
+  margin-bottom: 28px;
 }
-.table-header-btn:hover {
-  background: #29426c;
+
+h2, h3 {
   color: #fff;
+  margin-top: 0;
+  letter-spacing: 1px;
+}
+
+.player-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.player-table th,
+.player-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #363947;
+  text-align: left;
+}
+
+.player-table th {
+  background: #23262f;
+  font-weight: 600;
+  color: #f1f3fa;
+}
+
+.player-table tr {
+  transition: background .2s;
+}
+
+.player-table tr:hover {
+  background: #23262fbb;
+}
+
+.icon-btn {
+  background: #22232b;
+  border: none;
+  color: #eee;
+  padding: 8px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1em;
+  margin: 0 2px;
+  transition: background .2s;
+}
+
+.icon-btn:active, .icon-btn:focus, .icon-btn:hover {
+  background: #2d3039;
+  outline: none;
+}
+
+.copy-btn, .share-btn {
+  background: #363947;
+  border: none;
+  color: #eee;
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  margin-left: 6px;
+  font-size: 1em;
+  transition: background .2s;
+}
+
+.copy-btn:hover, .share-btn:hover {
+  background: #4b4e5e;
+}
+
+.start-game-btn {
+  display: block;
+  margin: 0 auto 28px auto;
+  background: linear-gradient(90deg,#18bfff 20%,#7f43f7 100%);
+  color: #fff;
+  font-weight: 600;
+  padding: 16px 60px;
+  border: none;
+  border-radius: 32px;
+  font-size: 1.2em;
+  box-shadow: 0 2px 12px 0 #18254055;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.start-game-btn:hover {
+  background: linear-gradient(90deg,#119ad6 20%,#6b30c8 100%);
+}
+
+.bottom-navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  background: #191b22;
+  border-top: 1px solid #22232b;
+  height: 76px;
+  z-index: 999;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-navbar .nav-tab {
+  flex: 1;
+  text-align: center;
+  color: #bbb;
+  font-size: 1.05em;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  transition: color .1s, background .18s;
+}
+
+.bottom-navbar .nav-tab.active {
+  color: #fff;
+  font-weight: 600;
+  background: #242635;
+  border-top: 2.5px solid #18bfff;
 }
