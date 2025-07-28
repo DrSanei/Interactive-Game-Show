@@ -231,3 +231,17 @@
   .players-table { font-size: .98em; }
   .video-embed { min-width: 0; min-height: 140px; }
 }
+
+/* Responsive Table Wrapper */
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Optional: Remove table background to keep the scroll visual clean on small devices */
+@media (max-width: 600px) {
+  .players-table {
+    min-width: 400px;
+    font-size: 0.95em;
+  }
+}
