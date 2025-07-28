@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+# Interactive Live Show MVP
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An open-source MVP for an **Interactive Live Show Platform** where audiences don’t just watch — they play a real role in the game.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+**Interactive Live Show** is a modern web platform that enables audiences to actively participate in live shows, such as Mafia, trivia, or talent contests. Unlike traditional streaming, viewers can influence outcomes in real time through voting, chat, and interactive controls, making each session a truly communal experience.
 
-### `npm start`
+This MVP demonstrates the core platform logic and user experience for a Mafia-style game show with three roles:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **God (Admin):** Starts and controls the game, invites players, manages the room, and can view/watch real-time votes and AI-generated audience summaries.
+- **Players:** Join the live video game as contestants, with camera/mic enabled, and play their roles as assigned by the admin.
+- **Watchers (Audience):** Join as spectators, watch/listen live, and contribute by voting, leaving comments, and interacting as a “collective 13th player.”
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- 🔴 **Live Video Grid:** Players join via webcam, displayed in a grid; Watchers can spectate all at once.
+- 🧑‍⚖️ **Admin Panel:** God/Admin starts/ends games, manages players, roles, and audience controls.
+- 🗳️ **Real-Time Voting:** Audience votes on each round, with results instantly reflected and visualized.
+- 🤖 **LLM Summaries:** Audience comments are summarized and analyzed (AI-integration-ready).
+- 📩 **Instant Invite Links:** Players join with a single click — no registration needed for MVP.
+- 🎛️ **Modern UI:** Clean, dark-themed dashboard, responsive for desktop and mobile.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Tech Stack
 
-### `npm run build`
+- **Frontend:** React.js (SPA), modular components
+- **Backend/Database:** Supabase (Postgres + REST API + Realtime)
+- **Video:** Jitsi (open-source live video)
+- **AI/LLM:** (Pluggable API integration, e.g., Grok, DeepSeek)
+- **Deployment:** Any platform supporting Node.js and React (Vercel, Netlify, etc.)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## How It Works
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Admin (“God”)** starts a new game session and shares the invite link with Players.
+2. **Players** join the video call and play their roles (e.g., Mafia, Citizen).
+3. **Watchers** wait for the show to start, then join to spectate and vote, answer questions, or comment.
+4. **Admin** monitors votes, assigns roles, controls all players’ cams/mics, and receives audience analysis.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Quick Start
 
-### `npm run eject`
+1. Clone the repo:  
+   `git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git`
+2. Install dependencies:  
+   `npm install`
+3. Configure environment variables (Supabase/Jitsi).
+4. Start development server:  
+   `npm start`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Customization
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Add new show/game types** by extending the component structure.
+- **Plug in any LLM/AI backend** for more advanced audience analysis.
+- **Easily swap video providers** (Jitsi, Zoom SDK, etc.) if needed.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## License
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+MIT — use, modify, and share freely.
 
-## Learn More
+## Contributors
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- [Your Name] (Lead)
+- [OpenAI GPT-4o, assist)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+**Contact:**  
+Have ideas, want to collaborate, or need support? Open an [issue](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/issues) or contact [YourEmail@example.com].
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
