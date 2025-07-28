@@ -143,11 +143,16 @@
   cursor: pointer;
   outline: none;
 }
-.nav-icon-btn.selected,
-.nav-icon-btn:active,
+.nav-icon-btn.selected{
+border-radius: 16px;
+}
+.nav-icon-btn:active {
+border-radius: 16px;
+}
 .nav-icon-btn:focus {
   color: #fff;
   background: #24284e;
+  border-radius: 16px;
 }
 .navbar-icon {
   font-size: 1.6em;
