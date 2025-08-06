@@ -16,7 +16,7 @@ function Home() {
           alt="Game Logo"
           className="home-logo"
         />
-        <h1>Baziche Platform</h1>
+        <h1>Mafia13 Platform</h1>
         <p className="home-sub">Interactive Live Game Shows</p>
       </div>
       <div className="home-buttons">
